@@ -220,7 +220,7 @@ export default function App() {
           {!showAdvanced && (  
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
                 <TouchableOpacity onPress={() => saveSet(reps, weight)} style={ExerciseStyles.saveButtonContainer}>
-                    <Text style={ExerciseStyles.saveButton}>Save</Text>
+                    <Text style={ExerciseStyles.saveButton}>Save. TESTING GIT BRANCH</Text>
                 </TouchableOpacity>
                 
                 <Text style={[ExerciseStyles.lastSetLabel, {left: 20, top: 4 }]}>{lastSet}</Text>
