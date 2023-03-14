@@ -1,26 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Switch, Text, TouchableOpacity, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { StyleSheet, View, Switch, Text, TouchableOpacity, TextInput, TouchableWithoutFeedback, Keyboard, SafeAreaView } from 'react-native';
 
+import ExerciseScreen from './components/ExerciseScreen';
 import SplitsButton from './components/SplitsButton';
 import ExerciseStyles from './components/ExerciseStyles';
-
-const Exercise = ({ name }) => {
-
-  return (
-    <View style={styles.exerciseContainer}>
-      <Text style={styles.exerciseName}>{name}</Text>
-      <View style={styles.lastSetContainer}>
-        <Text style={styles.lastSetText}>Last set:</Text>
-        <TextInput
-          style={styles.lastSetInput}
-          value={lastSet}
-          onChangeText={setLastSet}
-        />
-      </View>
-    </View>
-  );
-};
 
 export default function App() {
 
@@ -114,125 +98,42 @@ export default function App() {
           </View>
         );
         
-      case 'legDay1':
-        
-        return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <View style={styles.bodyContainer}>
-          <TextInput // Replace Text component with TextInput
-              style={ExerciseStyles.exerciseName}
-              value={exerciseName}
-              onChangeText={handleExerciseNameChange} // Define function to update exercise name
-              placeholder="Enter exercise name"
-              placeholderTextColor="#ccc"
-              onSubmitEditing={Keyboard.dismiss}
-              editable={true}
-            />
-            <View style={ExerciseStyles.lastSetContainer}>
-              <Text style={ExerciseStyles.lastSetLabel}>Best set:</Text>
-              <View style={ExerciseStyles.lastSetTextContainer}>
-                <TextInput
-                style={ExerciseStyles.lastSetText} 
-                value={reps}
-                onChangeText={setReps}
-                keyboardType="numeric" 
-                returnKeyType="done"></TextInput>
-              </View>
-
-              <Text style={ExerciseStyles.lastSetFor}>For</Text>
-
-              <View style={ExerciseStyles.lastWeightTextContainer}>
-                <TextInput
-                style={ExerciseStyles.LastWeightText}
-                value={weight}
-                onChangeText={setWeight}
-                keyboardType="numeric"
-                returnKeyType="done">
-              </TextInput>
-              </View>
-
-            </View>
-
-            {showAdvanced && (
-              <View style={ExerciseStyles.RorLcontainer}>
-                  <TextInput
-                    style={ExerciseStyles.RorLText}
-                    placeholder="R or L"
-                    placeholderTextColor="#355C7D"
-                    value={RorL}
-                    onChangeText={setRorL}
-                  />
-              </View>
-              )}
-
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: -10 }}>
-              <TouchableOpacity style={ExerciseStyles.advancedButton} onPress={toggleAdvanced}>
-                <Text style={ExerciseStyles.advancedButtonText}>Advanced</Text>
-              </TouchableOpacity>
-            </View>
-
-            {showAdvanced && (
-              <View style={{marginTop: 15}}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#355C7D" }}
-                    thumbColor={isEnabled ? "#030303" : "#f4f3f4"}
-                    onValueChange={toggleSwitch}
-                    value={isEnabled}
-                  />
-                  <Text style={{marginLeft: 10}}>To Failure</Text>
-                </View>
-                <View style={{ marginTop: 14 }}>
-                  <Text style={{ marginBottom: 5 }}>Static Hold Time:</Text>
-                  <TextInput
-                    style={ExerciseStyles.lastSetText}
-                    value={staticHoldTime}
-                    onChangeText={handleStaticHoldTimeChange}
-                    keyboardType="numeric"
-                    returnKeyType="done"
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text style={{ marginBottom: 5 }}>Dicentric Time:</Text>
-                  <TextInput
-                    style={ExerciseStyles.lastSetText}
-                    value={dicentricTime}
-                    onChangeText={handleDicentricTimeChange}
-                    keyboardType="numeric"
-                    returnKeyType="done"
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text style={{ marginBottom: 5 }}>Notes:</Text>
-                  <View style={{ backgroundColor: 'white', borderColor: 'black', borderWidth: 1 }}>
-                    <TextInput
-                      style={{ padding: 10 }}
-                      value={notes}
-                      onChangeText={setNotes}
-                      placeholder="Add your notes here"
-                      multiline={true}
-                    />
-                </View>
-              </View>
-            </View>
-            )}
-
-          {!showAdvanced && (  
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
-                <TouchableOpacity onPress={() => saveSet(reps, weight)} style={ExerciseStyles.saveButtonContainer}>
-                    <Text style={ExerciseStyles.saveButton}>Save. TESTING GIT BRANCH</Text>
+        case 'legDay1':
+          return (
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+              <View style={styles.bodyContainer}>
+                <ExerciseScreen
+                  lastSet={lastSet}
+                  weight={weight}
+                  setWeight={setWeight}
+                  reps={reps}
+                  setReps={setReps}
+                  showAdvanced={showAdvanced}
+                  toggleAdvanced={toggleAdvanced}
+                  isEnabled={isEnabled}
+                  toggleSwitch={toggleSwitch}
+                  staticHoldTime={staticHoldTime}
+                  handleStaticHoldTimeChange={handleStaticHoldTimeChange}
+                  dicentricTime={dicentricTime}
+                  handleDicentricTimeChange={handleDicentricTimeChange}
+                  RorL={RorL}
+                  setRorL={setRorL}
+                  notes={notes}
+                  setNotes={setNotes}
+                  exerciseName={exerciseName}
+                  handleExerciseNameChange={handleExerciseNameChange}
+                />
+                <TouchableOpacity style={styles.addButton} onPress={() => console.log("Button pressed")}>
+                  <Text >+</Text>
                 </TouchableOpacity>
-                
-                <Text style={[ExerciseStyles.lastSetLabel, {left: 20, top: 4 }]}>{lastSet}</Text>
-            </View>
-          )}
-          </View>
-        </TouchableWithoutFeedback>
-        );
-      default:
-        return null;
+              </View>
+            </TouchableWithoutFeedback>
+          );
+    
+        default:
+          return null;
+      }
     };
-  };
 
   return (
     <View style={styles.container}>
@@ -258,5 +159,16 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginVertical: 5,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: -210, // adjust this value to move the button up or down
+    right: -30,
+    backgroundColor: '#ccc',
+    borderRadius: 50,
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
