@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Switch, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Switch,
+  StyleSheet,
+} from 'react-native';
 
 
 import ExerciseStyles from './ExerciseStyles';
 
-const Exercise = ({ exerciseName, handleExerciseNameChange }) => {
-
+const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset }) => {
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
@@ -29,9 +37,10 @@ const Exercise = ({ exerciseName, handleExerciseNameChange }) => {
 
   const lastSet = `${reps} x ${weight}`;
 
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.bodyContainer}>
+      <View style={[styles.bodyContainer, { marginTop: 10 + yOffset }]}>
       <TextInput // Replace Text component with TextInput
           style={ExerciseStyles.exerciseName}
           value={exerciseName}
@@ -133,7 +142,7 @@ const Exercise = ({ exerciseName, handleExerciseNameChange }) => {
       {!showAdvanced && (  
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
             <TouchableOpacity onPress={() => saveSet(reps, weight)} style={ExerciseStyles.saveButtonContainer}>
-                <Text style={ExerciseStyles.saveButton}>Save. branch.</Text>
+                <Text style={ExerciseStyles.saveButton}>Save</Text>
             </TouchableOpacity>
             
             <Text style={[ExerciseStyles.lastSetLabel, {left: 20, top: 4 }]}>{lastSet}</Text>
@@ -153,10 +162,10 @@ const styles = StyleSheet.create({
   },
   bodyContainer: {
     position: 'absolute',
-    top: 10,
     left: 5,
     alignItems: 'flex-start',
     paddingBottom: 40, // add some padding at the bottom to make room for the button
+    marginBottom: 20, 
   },
   label: {
     fontWeight: 'bold',
