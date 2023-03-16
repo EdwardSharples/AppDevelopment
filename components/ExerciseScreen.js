@@ -13,19 +13,22 @@ import {
 
 import ExerciseStyles from './ExerciseStyles';
 
-const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset }) => {
+const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onToggleAdvanced, expanded, }) => {
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
   const [staticHoldTime, setStaticHoldTime] = useState('');
   const [dicentricTime, setDicentricTime] = useState('');
   const [notes, setNotes] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [RorL, setRorL] = useState('');
 
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
-  const toggleAdvanced = () => setShowAdvanced(previousState => !previousState);
+  const toggleAdvanced = () => {
+    onToggleAdvanced();
+  };
+
+  const showAdvanced = expanded;
 
   const handleStaticHoldTimeChange = (text) => setStaticHoldTime(text.replace(/[^0-9]/g, ''));
 
@@ -34,6 +37,7 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset }) => {
   const saveSet = (reps, weight) => {
     // Save set to database or local storage
   };
+  
 
   const lastSet = `${reps} x ${weight}`;
 

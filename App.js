@@ -14,6 +14,8 @@ import SplitsButton from './components/SplitsButton';
 export default function App() {
   const [view, setView] = useState('mainMenu');
   const [exerciseScreens, setExerciseScreens] = useState([""]); // Add a state for exercise screens
+  const [advancedOffset, setAdvancedOffset] = useState([]);
+  const [expandedIndex, setExpandedIndex] = useState(-1);
   
   const updateExerciseName = (newName, index) => {
     const newExerciseScreens = [...exerciseScreens];
@@ -22,16 +24,42 @@ export default function App() {
   };
 
   const renderExerciseScreens = () => {
-    return exerciseScreens.map((exerciseName, index) => (
-      <ExerciseScreen
-        key={index}
-        index={index}
-        exerciseName={exerciseName}
-        yOffset={index * 165}
-        handleExerciseNameChange={(newName) => updateExerciseName(newName, index)}
-      />
-    ));
+    return exerciseScreens.map((exerciseName, index) => {
+      const yOffset = exerciseScreens
+        .slice(0, index)
+        .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
+      return (
+        <ExerciseScreen
+          key={index}
+          index={index}
+          exerciseName={exerciseName}
+          yOffset={yOffset}
+          handleExerciseNameChange={(newName) => updateExerciseName(newName, index)}
+          onToggleAdvanced={() => handleToggleAdvanced(index)}
+          expanded={expandedIndex === index}
+        />
+      );
+    });
   };
+
+  const handleToggleAdvanced = (index) => {
+    if (expandedIndex === index) {
+      setExpandedIndex(-1);
+      setAdvancedOffset((prevOffsets) => {
+        const newOffsets = [...prevOffsets];
+        newOffsets[index] = 0;
+        return newOffsets;
+      });
+    } else {
+      setExpandedIndex(index);
+      setAdvancedOffset((prevOffsets) => {
+        const newOffsets = [...prevOffsets];
+        newOffsets[index] = 200;
+        return newOffsets;
+      });
+    }
+  };
+  
 
   const handleAddExercise = () => {
     setExerciseScreens([...exerciseScreens, ""]);
@@ -80,7 +108,7 @@ export default function App() {
               style={{ position: 'absolute', bottom: 10, right: 10}}
               onPress={handleAddExercise}
             >
-              <Text style={{ color: 'white', bottom: -15, left: 100 }}>Add Exercise</Text>
+              <Text style={{ color: 'white', bottom: -40 , left: 350 }}>Add Exercise</Text>
             </TouchableOpacity>
           </SafeAreaView>
           ); 
