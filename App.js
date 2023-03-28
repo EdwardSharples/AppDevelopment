@@ -6,10 +6,15 @@ import {
   TouchableOpacity,
   Text,
   SafeAreaView,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
+
 
 import ExerciseScreen from './components/ExerciseScreen';
 import SplitsButton from './components/SplitsButton';
+import ExerciseHistory from './components/ExerciseHistory';
+
 
 export default function App() {
   const [view, setView] = useState('mainMenu');
@@ -77,12 +82,29 @@ export default function App() {
     setView('legDay1');
   };
 
+  const handleExerciseHistoryPress = () => {
+    setView('exerciseHistory');
+  };
+
+  const handleGoBack = () => {
+    setView('split1');
+  };
+
+  const handleGoback2 = () => {
+    setView('splitList')
+  }
+
+  const handleGoback3 = () => {
+    setView('mainMenu')
+  }
+
   const renderView = () => {
     switch (view) {
       case 'mainMenu':
         return (
           <View style={styles.bodyContainer}>
             <SplitsButton label="Your Splits" onPress={handleSplitsPress} />
+            <SplitsButton label="Exercise History" onPress={handleExerciseHistoryPress} />
             {/* Other SplitsButton components */}
           </View>
         );
@@ -90,6 +112,7 @@ export default function App() {
         return (
           <View style={styles.bodyContainer}>
             <SplitsButton label="Split 1" onPress={handleSplit1Press} />
+            <SplitsButton label="Go back" onPress={handleGoback3} />
             {/* Other SplitsButton components */}
           </View>
         );
@@ -97,23 +120,47 @@ export default function App() {
         return (
           <View style={styles.bodyContainer}>
             <SplitsButton label="Leg Day 1" onPress={handleLegDay1Press} />
+            <SplitsButton label="Go back" onPress={handleGoback2} />
             {/* Other SplitsButton components */}
-          </View>
+          </View> 
         );
-      case 'legDay1':
-        return (
-          <SafeAreaView style={styles.bodyContainer}>
-            {renderExerciseScreens()}
-            <TouchableOpacity
-              style={{ position: 'absolute', bottom: 10, right: 10}}
-              onPress={handleAddExercise}
-            >
-              <Text style={{ color: 'white', bottom: -40 , left: 350 }}>Add Exercise</Text>
-            </TouchableOpacity>
-          </SafeAreaView>
-          ); 
-    }
-  };
+        case 'legDay1':
+          return (
+            <SafeAreaView style={styles.container}>
+              <ScrollView
+                style={{ flex: 1, paddingTop: 10 }}
+                contentContainerStyle={{right: 140, paddingHorizontal: 150 }} // Set minHeight to the height of the screen
+              >
+                <View style={{ minHeight: 1850 }}>
+                  {renderExerciseScreens()}
+                  <TouchableOpacity
+                    style={{
+                      alignSelf: 'flex-end',
+                      marginTop: 20,
+                      marginRight: 20,
+                    }}
+                    onPress={handleAddExercise}
+                  >
+                    <Text style={{ color: 'white', left: 250 }}>Add Exercise</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      alignSelf: 'flex-start',
+                      left: 265,
+                      top: 20
+                    }}
+                    onPress={handleGoBack}
+                  >
+                    <Text style={{ color: 'white' }}>Go Back</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </SafeAreaView>
+          );
+          case 'exerciseHistory':
+            return <ExerciseHistory onGoBack={() => setView('mainMenu')} />;
+      }
+    };
 
   return (
     <View style={styles.container}>

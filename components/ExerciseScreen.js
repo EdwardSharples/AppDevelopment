@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,9 @@ import {
   Switch,
   StyleSheet,
 } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 import ExerciseStyles from './ExerciseStyles';
@@ -32,11 +35,60 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
 
   const handleStaticHoldTimeChange = (text) => setStaticHoldTime(text.replace(/[^0-9]/g, ''));
 
-  const handleDicentricTimeChange = (text) => setDicentricTime(text.replace(/[^0-9]/g, ''));
+  const handleDicentricTimeChange = (text) => setDicentricTime(text.replace(/[^0-9]/g, '')); // Only allow numbers 0-9
 
-  const saveSet = (reps, weight) => {
-    // Save set to database or local storage
-  };
+  const saveSet = async (reps, weight) => {
+    const exerciseData = {
+      exerciseName,
+      reps,
+      weight,
+      isEnabled,
+      staticHoldTime,
+      dicentricTime,
+      notes,
+      RorL,
+    };
+  
+    try {
+      await AsyncStorage.setItem(`exercise_${index}`, JSON.stringify(exerciseData));
+      console.log(`Exercise data saved for exercise_${index}:`, exerciseData);
+    } catch (error) {
+      console.error("Error saving exercise data", error);
+    }
+  };  
+
+  useEffect(() => {
+    const getStoredData = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem(`exercise_${index}`);
+        if (storedData !== null) {
+          const {
+            exerciseName: storedName,
+            reps: storedReps,
+            weight: storedWeight,
+            isEnabled: storedIsEnabled,
+            staticHoldTime: storedStaticHoldTime,
+            dicentricTime: storedDicentricTime,
+            notes: storedNotes,
+            RorL: storedRorL,
+          } = JSON.parse(storedData);
+  
+          handleExerciseNameChange(storedName);
+          setReps(storedReps);
+          setWeight(storedWeight);
+          setIsEnabled(storedIsEnabled);
+          setStaticHoldTime(storedStaticHoldTime);
+          setDicentricTime(storedDicentricTime);
+          setNotes(storedNotes);
+          setRorL(storedRorL);
+        }
+      } catch (error) {
+        console.error("Error retrieving exercise data", error);
+      }
+    };
+  
+    getStoredData();
+  }, []);
   
 
   const lastSet = `${reps} x ${weight}`;
@@ -144,7 +196,7 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
         )}
 
       {!showAdvanced && (  
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <TouchableOpacity onPress={() => saveSet(reps, weight)} style={ExerciseStyles.saveButtonContainer}>
                 <Text style={ExerciseStyles.saveButton}>Save</Text>
             </TouchableOpacity>
@@ -170,6 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingBottom: 40, // add some padding at the bottom to make room for the button
     marginBottom: 20, 
+    width: 300,
   },
   label: {
     fontWeight: 'bold',
