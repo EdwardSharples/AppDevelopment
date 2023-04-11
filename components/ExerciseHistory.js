@@ -22,30 +22,39 @@ const ExerciseHistory = ( {onGoBack} ) => {
         })
       );
       setHistoryData(history);
+      console.log("History data:", history);
     } catch (error) {
       console.error(error);
     }
   };
-const renderItem = ({ item, index }) => {
-  const isExpanded = expandedItemIndex === index;
+  const renderItem = ({ item, index }) => {
 
-  return (
-    <TouchableOpacity onPress={() => toggleExpandedItem(index)}>
-      <View style={styles.itemContainer}>
-        <Text style={styles.itemText}>{item.exerciseName}: </Text>
-        <Text style={styles.itemText}>{item.reps} for {item.weight}</Text>
-      </View>
-      {isExpanded && (
-        <View style={styles.expandedContainer}>
-          <Text style={styles.expandedText}>To Failure: {item.isEnabled ? 'Yes' : 'No'}</Text>
-          <Text style={styles.expandedText}>Static Hold Time: {item.staticHoldTime} seconds</Text>
-          <Text style={styles.expandedText}>Dicentric Time: {item.dicentricTime} seconds</Text>
-          <Text style={styles.expandedText}>Notes: {item.notes}</Text>
+    if (!item) {
+      console.warn(`Null item at index ${index}`);
+      return null;
+    }
+
+    console.log("Item data:", item);
+
+    const isExpanded = expandedItemIndex === index;
+  
+    return (
+      <TouchableOpacity onPress={() => toggleExpandedItem(index)}>
+        <View style={styles.itemContainer}>
+          <Text style={styles.itemText}>{item.exerciseName}: </Text>
+          <Text style={styles.itemText}>{item.reps} for {item.weight}</Text>
         </View>
-      )}
-    </TouchableOpacity>
-  );
-};
+        {isExpanded && (
+          <View style={styles.expandedContainer}>
+            <Text style={styles.expandedText}>To Failure: {item.isEnabled ? 'Yes' : 'No'}</Text>
+            <Text style={styles.expandedText}>Static Hold Time: {item.staticHoldTime} seconds</Text>
+            <Text style={styles.expandedText}>Dicentric Time: {item.dicentricTime} seconds</Text>
+            <Text style={styles.expandedText}>Notes: {item.notes}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
 
   const toggleExpandedItem = (index) => {

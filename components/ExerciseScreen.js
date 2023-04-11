@@ -11,12 +11,9 @@ import {
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-
 import ExerciseStyles from './ExerciseStyles';
 
-const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onToggleAdvanced, expanded, }) => {
+const ExerciseScreen = ({ exerciseName, yOffset, index, expanded, onToggleAdvanced, exercises, handleToggleAdvanced, updateExerciseName, day }) => { 
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
@@ -24,22 +21,24 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
   const [dicentricTime, setDicentricTime] = useState('');
   const [notes, setNotes] = useState('');
   const [RorL, setRorL] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [localExerciseName, setLocalExerciseName] = useState(exerciseName || "");
 
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-
-  const toggleAdvanced = () => {
-    onToggleAdvanced();
-  };
-
-  const showAdvanced = expanded;
 
   const handleStaticHoldTimeChange = (text) => setStaticHoldTime(text.replace(/[^0-9]/g, ''));
 
   const handleDicentricTimeChange = (text) => setDicentricTime(text.replace(/[^0-9]/g, '')); // Only allow numbers 0-9
 
+  const toggleAdvanced = () => {
+    setShowAdvanced((prevShowAdvanced) => !prevShowAdvanced);
+
+    onToggleAdvanced();
+  };
+
   const saveSet = async (reps, weight) => {
     const exerciseData = {
-      exerciseName,
+      exerciseName: localExerciseName,
       reps,
       weight,
       isEnabled,
@@ -73,7 +72,9 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
             RorL: storedRorL,
           } = JSON.parse(storedData);
   
-          handleExerciseNameChange(storedName);
+          updateExerciseName(day, storedName, index);
+
+
           setReps(storedReps);
           setWeight(storedWeight);
           setIsEnabled(storedIsEnabled);
@@ -88,7 +89,7 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
     };
   
     getStoredData();
-  }, []);
+  }, [index]);
   
 
   const lastSet = `${reps} x ${weight}`;
@@ -96,11 +97,14 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.bodyContainer, { marginTop: 10 + yOffset }]}>
-      <TextInput // Replace Text component with TextInput
+      <View style={[styles.bodyContainer, {marginTop: yOffset[index] || 150}]}>
+      <TextInput
           style={ExerciseStyles.exerciseName}
-          value={exerciseName}
-          onChangeText={handleExerciseNameChange} // Define function to update exercise name
+          value={localExerciseName}
+          onChangeText={(newName) => {
+            setLocalExerciseName(newName);
+            updateExerciseName(day, newName, index);
+          }}
           placeholder="Enter exercise name"
           placeholderTextColor="#ccc"
           onSubmitEditing={Keyboard.dismiss}
@@ -195,7 +199,7 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
         </View>
         )}
 
-      {!showAdvanced && (  
+      {!showAdvanced && (
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <TouchableOpacity onPress={() => saveSet(reps, weight)} style={ExerciseStyles.saveButtonContainer}>
                 <Text style={ExerciseStyles.saveButton}>Save</Text>
@@ -209,6 +213,7 @@ const Exercise = ({ exerciseName, handleExerciseNameChange, yOffset, index, onTo
 );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -217,12 +222,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bodyContainer: {
-    position: 'absolute',
+    position: 'relative',
     left: 5,
     alignItems: 'flex-start',
-    paddingBottom: 40, // add some padding at the bottom to make room for the button
-    marginBottom: 20, 
+    paddingBottom: 10, // add some padding at the bottom to make room for the button
+    marginBottom: -150,
+    marginTop: 100,
     width: 300,
+    bottom: 400,
+    bottom: 150,
   },
   label: {
     fontWeight: 'bold',
@@ -230,4 +238,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Exercise;
+export default ExerciseScreen;
