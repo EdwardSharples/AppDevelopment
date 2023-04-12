@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   // State variable to control which view is displayed
-  const [view, setView] = useState('exerciseHistory');
+  const [view, setView] = useState('mainMenu');
   const [exerciseScreens, setExerciseScreens] = useState({});
   const [advancedOffset, setAdvancedOffset] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(-1);
@@ -26,9 +26,6 @@ export default function App() {
   const [isEditingLabels, setIsEditingLabels] = useState(false);
   const [yOffsets, setYOffsets] = useState(Array(exerciseScreens[view]?.exercises.length || 0).fill(0));
 
-  // newName: The new name of the exercise
-  // index: The index at which the exercise is present in the exerciseScreens array
-  
   const updateExerciseName = async (day, newName, index) => {
     setExerciseScreens((prevScreens) => {
       const newScreens = { ...prevScreens };
@@ -51,14 +48,14 @@ export default function App() {
   
     // Save the updated exercise name in AsyncStorage
     try {
-      const storedData = await AsyncStorage.getItem(`exercise_${index}`);
+      const storedData = await AsyncStorage.getItem(`exercise_${day}_${index}`);
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         parsedData.exerciseName = newName;
-        await AsyncStorage.setItem(`exercise_${index}`, JSON.stringify(parsedData));
+        await AsyncStorage.setItem(`exercise_${day}_${index}`, JSON.stringify(parsedData));
       }
     } catch (error) {
-      console.error('Error updating exercise name:', error);
+      console.error("Error updating exercise name:", error);
     }
   };
 
@@ -214,12 +211,12 @@ export default function App() {
                     exercises={exerciseScreens[view]?.exercises}
                     handleAddExercise={() => handleAddExercise(view)}
                     handleGoBack={handleGoBack}
-                    updateExerciseName={updateExerciseName}
                     handleToggleAdvanced={(index) => handleToggleAdvanced(view, index)}
                     expandedIndex={expandedIndex}
                     advancedOffset={advancedOffset}
                     exerciseScreens={exerciseScreens}
                     yOffsets={yOffsets}
+                    updateExerciseName={(newName, index) => updateExerciseName(view, newName, index)}
                   />
                 );
               }

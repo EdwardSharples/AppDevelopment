@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const ExerciseHistory = ( {onGoBack} ) => {
   const [historyData, setHistoryData] = useState([]);
   const [expandedItemIndex, setExpandedItemIndex] = useState(null);
-
+  
   useEffect(() => {
     fetchData();
   }, []);

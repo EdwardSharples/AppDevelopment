@@ -13,7 +13,18 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ExerciseStyles from './ExerciseStyles';
 
-const ExerciseScreen = ({ exerciseName, yOffset, index, expanded, onToggleAdvanced, exercises, handleToggleAdvanced, updateExerciseName, day }) => { 
+const ExerciseScreen = ({
+  exerciseName,
+  yOffset,
+  index,
+  expanded,
+  onToggleAdvanced,
+  exercises,
+  handleToggleAdvanced,
+  updateExerciseName,
+  day,
+  onSaveSet,
+}) => {
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
@@ -36,60 +47,53 @@ const ExerciseScreen = ({ exerciseName, yOffset, index, expanded, onToggleAdvanc
     onToggleAdvanced();
   };
 
-  const saveSet = async (reps, weight) => {
-    const exerciseData = {
-      exerciseName: localExerciseName,
-      reps,
-      weight,
-      isEnabled,
-      staticHoldTime,
-      dicentricTime,
-      notes,
-      RorL,
-    };
-  
+  const saveSet = async (day, reps, weight) => {
     try {
-      await AsyncStorage.setItem(`exercise_${index}`, JSON.stringify(exerciseData));
-      console.log(`Exercise data saved for exercise_${index}:`, exerciseData);
+      const exerciseData = {
+        exerciseName: localExerciseName,
+        reps,
+        weight,
+        isEnabled,
+        staticHoldTime,
+        dicentricTime,
+        notes,
+      };
+      console.log("Saving data for day:", day);
+      const key = `exercise_${day}_${index}`;
+      await AsyncStorage.setItem(key, JSON.stringify(exerciseData));
+      console.log("Data saved:", exerciseData);
+  
+      // Call the updateExerciseName callback to update the exercise name in the parent component
+      updateExerciseName(day, localExerciseName, index);
     } catch (error) {
-      console.error("Error saving exercise data", error);
+      console.error("Error saving exercise data:", error);
     }
-  };  
+  };
+   
 
   useEffect(() => {
-    const getStoredData = async () => {
+    const getStoredData = async (day) => {
       try {
-        const storedData = await AsyncStorage.getItem(`exercise_${index}`);
-        if (storedData !== null) {
-          const {
-            exerciseName: storedName,
-            reps: storedReps,
-            weight: storedWeight,
-            isEnabled: storedIsEnabled,
-            staticHoldTime: storedStaticHoldTime,
-            dicentricTime: storedDicentricTime,
-            notes: storedNotes,
-            RorL: storedRorL,
-          } = JSON.parse(storedData);
-  
-          updateExerciseName(day, storedName, index);
-
-
-          setReps(storedReps);
-          setWeight(storedWeight);
-          setIsEnabled(storedIsEnabled);
-          setStaticHoldTime(storedStaticHoldTime);
-          setDicentricTime(storedDicentricTime);
-          setNotes(storedNotes);
-          setRorL(storedRorL);
+        console.log("Retrieving data for day:", day);
+        const key = `exercise_${day}_${index}`;
+        const storedData = await AsyncStorage.getItem(key);
+        if (storedData) {
+          const exerciseData = JSON.parse(storedData);
+          setReps(exerciseData.reps);
+          setWeight(exerciseData.weight);
+          setIsEnabled(exerciseData.isEnabled);
+          setStaticHoldTime(exerciseData.staticHoldTime);
+          setDicentricTime(exerciseData.dicentricTime);
+          setNotes(exerciseData.notes);
+          setLocalExerciseName(exerciseData.exerciseName);
         }
       } catch (error) {
-        console.error("Error retrieving exercise data", error);
+        console.error("Error retrieving exercise data:", error);
       }
     };
   
-    getStoredData();
-  }, [index]);
+    getStoredData(day);
+  }, []);
   
 
   const lastSet = `${reps} x ${weight}`;
@@ -97,13 +101,12 @@ const ExerciseScreen = ({ exerciseName, yOffset, index, expanded, onToggleAdvanc
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.bodyContainer, {marginTop: yOffset[index] || 150}]}>
-      <TextInput
+      <View style={[styles.bodyContainer, { marginTop: yOffset[index] || 150 }]}>
+        <TextInput
           style={ExerciseStyles.exerciseName}
           value={localExerciseName}
           onChangeText={(newName) => {
             setLocalExerciseName(newName);
-            updateExerciseName(day, newName, index);
           }}
           placeholder="Enter exercise name"
           placeholderTextColor="#ccc"
@@ -201,7 +204,7 @@ const ExerciseScreen = ({ exerciseName, yOffset, index, expanded, onToggleAdvanc
 
       {!showAdvanced && (
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <TouchableOpacity onPress={() => saveSet(reps, weight)} style={ExerciseStyles.saveButtonContainer}>
+            <TouchableOpacity onPress={() => saveSet(day, reps, weight)} style={ExerciseStyles.saveButtonContainer}>
                 <Text style={ExerciseStyles.saveButton}>Save</Text>
             </TouchableOpacity>
             

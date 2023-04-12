@@ -14,7 +14,7 @@ const MainMenu = ({ onViewChange }) => {
 
   return (
     <View style={styles.bodyContainer}>
-      <SplitsButton label="Your Splits" onPress={handleSplitsPress} />
+      <SplitsButton label="Your Split" onPress={handleSplitsPress} />
       <SplitsButton label="Exercise History" onPress={handleExerciseHistoryPress} />
       {/* Other SplitsButton components */}
     </View>

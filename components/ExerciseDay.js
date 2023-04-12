@@ -16,13 +16,14 @@ const ExerciseDay = ({
   exercises,
   handleAddExercise,
   handleGoBack,
-  updateExerciseName,
   handleToggleAdvanced,
   expandedIndex,
   advancedOffset,
   exerciseScreens,
   yOffsets,
+  updateExerciseName,
 }) => {
+  console.log('Current view in ExerciseDay:', day);
   const renderExerciseScreens = () => {
     return exercises.map((exercise, index) => {
       const yOffset = yOffsets[index] || exercises
@@ -31,13 +32,15 @@ const ExerciseDay = ({
   
       return (
         <ExerciseScreen
-          key={index}
+          key={`${day}_${index}`}
+          day={day}
           index={index}
           exerciseName={exercise.exerciseName}
           yOffset={yOffset}
-          updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
           onToggleAdvanced={() => handleToggleAdvanced(day, index)}
           expanded={expandedIndex === index}
+          onSaveSet={(reps, weight) => saveSet(index, reps, weight)}
+          updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
         />
       );
     });
