@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet
 } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 import ExerciseScreen from './ExerciseScreen';
 
@@ -22,14 +23,35 @@ const ExerciseDay = ({
   exerciseScreens,
   yOffsets,
   updateExerciseName,
+  localExerciseName,
+  exerciseUpdates,
+  handleUpdateYOffsets,
 }) => {
   console.log('Current view in ExerciseDay:', day);
+  console.log('Current exercises in ExerciseDay:', exercises);
+
+  useEffect(() => {
+    if (
+      typeof handleUpdateYOffsets === 'function' &&
+      JSON.stringify(yOffsets) !== JSON.stringify(Array(exerciseScreens[day]?.exercises.length || 0).fill(0))
+    ) {
+      handleUpdateYOffsets(Array(exerciseScreens[day]?.exercises.length || 0).fill(0));
+    }
+  }, [exerciseScreens, day, exerciseUpdates, handleUpdateYOffsets, yOffsets]);
+
+  const handleDeleteExercise = (index) => {
+    console.log(`Deleting exercise for day ${day}, index ${index}`);
+    // Add your delete logic here
+  };
+
   const renderExerciseScreens = () => {
-    return exercises.map((exercise, index) => {
+    return exercises && exercises.map((exercise, index) => {
+      console.log(`Rendering exercise screen for day ${day}, index ${index}`);
       const yOffset = yOffsets[index] || exercises
         .slice(0, index)
         .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
-  
+      console.log("yOffset for index", index, ":", yOffset);
+      console.log("ExerciseDay exercises:", exercises);
       return (
         <ExerciseScreen
           key={`${day}_${index}`}
@@ -39,7 +61,7 @@ const ExerciseDay = ({
           yOffset={yOffset}
           onToggleAdvanced={() => handleToggleAdvanced(day, index)}
           expanded={expandedIndex === index}
-          onSaveSet={(reps, weight) => saveSet(index, reps, weight)}
+          onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
           updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
         />
       );
@@ -49,8 +71,11 @@ const ExerciseDay = ({
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
-        style={{ flex: 1, paddingTop: 10 }}
-        contentContainerStyle={{ right: 140, paddingHorizontal: 150 }}
+        style={{ flex: 1, right: 50, }}
+        contentContainerStyle={{ paddingHorizontal: 50 }}
+        horizontal={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <View style={{ minHeight: 1850 }}>
           {renderExerciseScreens()}

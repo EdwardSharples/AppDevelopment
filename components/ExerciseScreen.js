@@ -24,6 +24,7 @@ const ExerciseScreen = ({
   updateExerciseName,
   day,
   onSaveSet,
+  onDelete,
 }) => {
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
@@ -48,6 +49,7 @@ const ExerciseScreen = ({
   };
 
   const saveSet = async (day, reps, weight) => {
+    console.log(`Saving exercise data for day ${day}, reps ${reps}, weight ${weight}`);
     try {
       const exerciseData = {
         exerciseName: localExerciseName,
@@ -60,10 +62,26 @@ const ExerciseScreen = ({
       };
       console.log("Saving data for day:", day);
       const key = `exercise_${day}_${index}`;
-      await AsyncStorage.setItem(key, JSON.stringify(exerciseData));
+      const existingData = await AsyncStorage.getItem(key);
+      let exerciseHistory = [];
+      if (existingData) {
+        exerciseHistory = JSON.parse(existingData);
+        const existingExerciseIndex = exerciseHistory.findIndex(
+          (exercise) => exercise.exerciseName === localExerciseName
+        );
+        if (existingExerciseIndex !== -1) {
+          exerciseHistory[existingExerciseIndex].data.push(exerciseData);
+        } else {
+          exerciseHistory.push({ exerciseName: localExerciseName, data: [exerciseData] });
+        }
+      } else {
+        exerciseHistory.push({ exerciseName: localExerciseName, data: [exerciseData] });
+      }
+      await AsyncStorage.setItem(key, JSON.stringify(exerciseHistory));
       console.log("Data saved:", exerciseData);
   
       // Call the updateExerciseName callback to update the exercise name in the parent component
+      console.log("Calling updateExerciseName with day:", day, "localExerciseName:", localExerciseName, "index:", index);
       updateExerciseName(day, localExerciseName, index);
     } catch (error) {
       console.error("Error saving exercise data:", error);
@@ -76,27 +94,66 @@ const ExerciseScreen = ({
       try {
         console.log("Retrieving data for day:", day);
         const key = `exercise_${day}_${index}`;
+        console.log(`Key: ${key}`)
         const storedData = await AsyncStorage.getItem(key);
+        console.log(`Stored data: ${storedData}`)
         if (storedData) {
           const exerciseData = JSON.parse(storedData);
-          setReps(exerciseData.reps);
-          setWeight(exerciseData.weight);
-          setIsEnabled(exerciseData.isEnabled);
-          setStaticHoldTime(exerciseData.staticHoldTime);
-          setDicentricTime(exerciseData.dicentricTime);
-          setNotes(exerciseData.notes);
-          setLocalExerciseName(exerciseData.exerciseName);
+          console.log("Exercise data:", exerciseData);
+
+          if (exerciseData.length > 0) {
+            const exerciseName = exerciseData[0].exerciseName;
+            setLocalExerciseName(exerciseName);
+          }
+
+          const currentExercise = exerciseData.find((exercise) => exercise.exerciseName === exerciseName);
+          console.log("Current exercise:", currentExercise);
+
+          if (currentExercise) {
+            setReps(currentExercise.data[currentExercise.data.length - 1].reps);
+            setWeight(currentExercise.data[currentExercise.data.length - 1].weight);
+            setIsEnabled(currentExercise.data[currentExercise.data.length - 1].isEnabled);
+            setStaticHoldTime(currentExercise.data[currentExercise.data.length - 1].staticHoldTime);
+            setDicentricTime(currentExercise.data[currentExercise.data.length - 1].dicentricTime);
+            setNotes(currentExercise.data[currentExercise.data.length - 1].notes);
+          }
         }
       } catch (error) {
         console.error("Error retrieving exercise data:", error);
       }
     };
-  
     getStoredData(day);
-  }, []);
+  }, [day]);
   
+  useEffect(() => {
+    if (localExerciseName) {
+      const loadData = async () => {
+        try {
+          const storedData = await AsyncStorage.getItem(`exercise_${day}_${index}`);
+          if (storedData) {
+            const exerciseData = JSON.parse(storedData);
+            const currentExercise = exerciseData.find(
+              (exercise) => exercise.exerciseName === localExerciseName
+            );
+            if (currentExercise) {
+              setReps(currentExercise.data[currentExercise.data.length - 1].reps);
+              setWeight(currentExercise.data[currentExercise.data.length - 1].weight);
+              setIsEnabled(currentExercise.data[currentExercise.data.length - 1].isEnabled);
+              setStaticHoldTime(currentExercise.data[currentExercise.data.length - 1].staticHoldTime);
+              setDicentricTime(currentExercise.data[currentExercise.data.length - 1].dicentricTime);
+              setNotes(currentExercise.data[currentExercise.data.length - 1].notes);
+            }
+          }
+        } catch (error) {
+          console.error("Error retrieving exercise data:", error);
+        }
+      };
+      loadData();
+    }
+  }, [localExerciseName]);
 
-  const lastSet = `${reps} x ${weight}`;
+  const lastSet = `${reps || 0} x ${weight || 0}`;
+
 
 
   return (
@@ -105,9 +162,7 @@ const ExerciseScreen = ({
         <TextInput
           style={ExerciseStyles.exerciseName}
           value={localExerciseName}
-          onChangeText={(newName) => {
-            setLocalExerciseName(newName);
-          }}
+          onChangeText={setLocalExerciseName}
           placeholder="Enter exercise name"
           placeholderTextColor="#ccc"
           onSubmitEditing={Keyboard.dismiss}

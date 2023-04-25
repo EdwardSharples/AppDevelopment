@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
+  ActivityIndicator,
 } from 'react-native';
 
 
@@ -25,8 +26,11 @@ export default function App() {
   const [splitButtons, setSplitButtons] = useState([]);
   const [isEditingLabels, setIsEditingLabels] = useState(false);
   const [yOffsets, setYOffsets] = useState(Array(exerciseScreens[view]?.exercises.length || 0).fill(0));
+  const [exerciseUpdates, setExerciseUpdates] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const updateExerciseName = async (day, newName, index) => {
+    console.log(`Updating exercise name for day ${day}, newName ${newName}, index ${index}`);
     setExerciseScreens((prevScreens) => {
       const newScreens = { ...prevScreens };
   
@@ -57,6 +61,7 @@ export default function App() {
     } catch (error) {
       console.error("Error updating exercise name:", error);
     }
+    setExerciseUpdates((prevUpdates) => prevUpdates + 1);
   };
 
   const handleAddExercise = (day) => {
@@ -66,11 +71,11 @@ export default function App() {
       // Initialize the day key if it doesn't exist and add a new exercise
       if (!newScreens[day]) {
         newScreens[day] = {
-          exercises: [{ exerciseName: "", reps: "", weight: "", isEnabled: false, notes: "", staticHoldTime: "", dicentricTime: "", RorL: "" }],
+          exercises: [{ exerciseName: "", reps: "", weight: "", isEnabled: false, notes: "", staticHoldTime: "", dicentricTime: "", RorL: "", yOffset: 0 }],
         };
       } else {
         // Add a new exercise to the day's exercises array
-        newScreens[day].exercises = [...newScreens[day].exercises, { exerciseName: "", reps: "", weight: "", isEnabled: false, notes: "", staticHoldTime: "", dicentricTime: "", RorL: "" }];
+        newScreens[day].exercises = [...newScreens[day].exercises, { exerciseName: "", reps: "", weight: "", isEnabled: false, notes: "", staticHoldTime: "", dicentricTime: "", RorL: "", yOffset: 0 }];
       }
   
       return newScreens;
@@ -84,12 +89,68 @@ export default function App() {
     });
   };
   
+  const handleUpdateYOffsets = (newYOffsets) => {
+    // Update the yOffsets state here
+    setYOffsets(newYOffsets);
+  };
   
 
   useEffect(() => {
   }, [advancedOffset]);
   useEffect(() => {
   }, [expandedIndex]); 
+
+  useEffect(() => {
+    const loadSplitButtons = async () => {
+      try {
+        const storedSplitButtons = await AsyncStorage.getItem("splitButtons");
+        if (storedSplitButtons) {
+          const loadedSplitButtons = JSON.parse(storedSplitButtons);
+          const reconstructedSplitButtons = loadedSplitButtons.map((button) => {
+            return {
+              ...button,
+              onPress: () => setView(button.day),
+            };
+          });
+          setSplitButtons(reconstructedSplitButtons);
+        }
+      } catch (error) {
+        console.error("Error loading splitButtons:", error);
+      }
+    };
+    
+  
+    loadSplitButtons();
+  }, []);
+
+  useEffect(() => {
+    const loadExerciseScreens = async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        const exerciseScreenKeys = keys.filter((key) => key.startsWith("exercise_"));
+        const storedData = await AsyncStorage.multiGet(exerciseScreenKeys);
+  
+        const newExerciseScreens = {};
+        storedData.forEach(([key, value]) => {
+          const [_, day, index] = key.split("_");
+          const parsedData = JSON.parse(value);
+  
+          if (!newExerciseScreens[day]) {
+            newExerciseScreens[day] = { exercises: [] };
+          }
+          newExerciseScreens[day].exercises[parseInt(index)] = parsedData;
+        });
+        setExerciseScreens(newExerciseScreens);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading exercise screens:", error);
+      }
+    };
+  
+    loadExerciseScreens();
+  }, []);
+  
+  
 
   const handleToggleAdvanced = (day, index) => {
     setAdvancedOffset((prevOffsets) => {
@@ -134,15 +195,23 @@ export default function App() {
     setSplitButtons((prevSplitButtons) => {
       const updatedSplitButtons = [...prevSplitButtons];
       updatedSplitButtons[index].label = newLabel;
+      
+      try {
+        AsyncStorage.setItem("splitButtons", JSON.stringify(updatedSplitButtons));
+      } catch (error) {
+        console.error("Error saving updated splitButtons:", error);
+      }
+
       return updatedSplitButtons;
     });
   };  
 
-  const createNewSplitButton = () => {
+  const createNewSplitButton = async () => {
     const newDay = `day${splitButtons.length + 1}`;
     const newLabel = `New Day ${splitButtons.length + 1}`;
     const newSplitButton = {
       label: newLabel,
+      day: newDay,
       onPress: () => setView(newDay),
     };
   
@@ -150,7 +219,15 @@ export default function App() {
     setExerciseScreens((prevScreens) => {
       return { ...prevScreens, [newDay]: { exercises: [""] } };
     });
+
+    try {
+      const updatedSplitButtons = [...splitButtons, newSplitButton];
+      await AsyncStorage.setItem("splitButtons", JSON.stringify(updatedSplitButtons));
+    } catch (error) {
+      console.error("Error saving splitButtons:", error);
+    }
   };
+  
   
   const toggleEditingLabels = () => {
     setIsEditingLabels(!isEditingLabels);
@@ -167,6 +244,9 @@ export default function App() {
   };
 
   const renderView = () => {
+    if (isLoading) {
+      return <ActivityIndicator size="large" color="#FFFFFF" />;
+    }
     switch (true) {
       case view === 'mainMenu':
         return <MainMenu onViewChange={setView} />;
@@ -217,6 +297,8 @@ export default function App() {
                     exerciseScreens={exerciseScreens}
                     yOffsets={yOffsets}
                     updateExerciseName={(newName, index) => updateExerciseName(view, newName, index)}
+                    exerciseUpdates={exerciseUpdates}
+                    handleUpdateYOffsets={handleUpdateYOffsets}
                   />
                 );
               }

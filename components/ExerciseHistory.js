@@ -11,45 +11,66 @@ const ExerciseHistory = ( {onGoBack} ) => {
     fetchData();
   }, []);
 
+  const handleClearAsyncStorage = () => {
+    AsyncStorage.clear().then(() => {
+      console.log('AsyncStorage cleared');
+    });
+  };
+
   const fetchData = async () => {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const exerciseKeys = keys.filter((key) => key.startsWith('exercise_'));
-      const history = await Promise.all(
-        exerciseKeys.map(async (key) => {
-          const data = await AsyncStorage.getItem(key);
-          return JSON.parse(data);
-        })
-      );
+      let history = [];
+      for (const key of exerciseKeys) {
+        const data = await AsyncStorage.getItem(key);
+        history = history.concat(JSON.parse(data));
+      }
       setHistoryData(history);
-      console.log("History data:", history);
+      console.log("History data:", JSON.stringify(history, null, 2));
     } catch (error) {
       console.error(error);
     }
   };
-  const renderItem = ({ item, index }) => {
 
+  const groupExercisesByName = (exercises) => {
+    const groupedExercises = exercises.reduce((acc, exercise) => {
+      if (acc[exercise.exerciseName]) {
+        acc[exercise.exerciseName].push(exercise);
+      } else {
+        acc[exercise.exerciseName] = [exercise];
+      }
+      return acc;
+    }, {});
+  
+    return groupedExercises;
+  };
+  
+
+  const renderItem = ({ item, index }) => {
     if (!item) {
       console.warn(`Null item at index ${index}`);
       return null;
     }
-
+  
     console.log("Item data:", item);
-
+  
     const isExpanded = expandedItemIndex === index;
+    const groupedExercises = groupExercisesByName(historyData);
   
     return (
       <TouchableOpacity onPress={() => toggleExpandedItem(index)}>
         <View style={styles.itemContainer}>
           <Text style={styles.itemText}>{item.exerciseName}: </Text>
-          <Text style={styles.itemText}>{item.reps} for {item.weight}</Text>
         </View>
-        {isExpanded && (
+        {isExpanded && item.data && (
           <View style={styles.expandedContainer}>
-            <Text style={styles.expandedText}>To Failure: {item.isEnabled ? 'Yes' : 'No'}</Text>
-            <Text style={styles.expandedText}>Static Hold Time: {item.staticHoldTime} seconds</Text>
-            <Text style={styles.expandedText}>Dicentric Time: {item.dicentricTime} seconds</Text>
-            <Text style={styles.expandedText}>Notes: {item.notes}</Text>
+            {item.data.map((exercise, exerciseIndex) => (
+              <Text key={exerciseIndex} style={styles.itemText}>
+                {exercise.reps} for {exercise.weight}
+                {exerciseIndex === 0 ? " (Current)" : " (Previous)"}
+              </Text>
+            ))}
           </View>
         )}
       </TouchableOpacity>
@@ -87,6 +108,20 @@ const ExerciseHistory = ( {onGoBack} ) => {
       >
         <Text style={{ color: 'white' }}>Go back</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+      style={{
+        alignSelf: 'center',
+        bottom: 30,
+        backgroundColor: 'red',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 5,
+        marginTop: 10, // Add some margin to separate the buttons
+      }}
+      onPress={handleClearAsyncStorage}
+    >
+      <Text style={{ color: 'white' }}>Clear AsyncStorage</Text>
+    </TouchableOpacity>
     </View>
   );
 };
@@ -109,12 +144,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: 'white',
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: 100,
+    paddingVertical: 10,
     borderRadius: 10,
     marginBottom: 10,
-    width: '75%',
-    left: 30,
+    width: '100%',
   },
   itemText: {
     fontSize: 16,
@@ -122,12 +156,13 @@ const styles = StyleSheet.create({
   },
   expandedContainer: {
     backgroundColor: '#3c4043',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 10, 
     borderRadius: 5,
     marginBottom: 10,
-    width: '90%',
+    width: '95%', 
   },
+  
   expandedText: {
     fontSize: 14,
     fontWeight: '500',
