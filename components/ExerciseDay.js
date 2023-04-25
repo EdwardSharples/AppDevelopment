@@ -8,6 +8,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { Swipeable } from 'react-native-gesture-handler';
 
 import ExerciseScreen from './ExerciseScreen';
 
@@ -44,29 +45,54 @@ const ExerciseDay = ({
     // Add your delete logic here
   };
 
-  const renderExerciseScreens = () => {
-    return exercises && exercises.map((exercise, index) => {
-      console.log(`Rendering exercise screen for day ${day}, index ${index}`);
-      const yOffset = yOffsets[index] || exercises
-        .slice(0, index)
-        .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
-      console.log("yOffset for index", index, ":", yOffset);
-      console.log("ExerciseDay exercises:", exercises);
-      return (
-        <ExerciseScreen
-          key={`${day}_${index}`}
-          day={day}
-          index={index}
-          exerciseName={exercise.exerciseName}
-          yOffset={yOffset}
-          onToggleAdvanced={() => handleToggleAdvanced(day, index)}
-          expanded={expandedIndex === index}
-          onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
-          updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
-        />
+const renderExerciseScreens = () => {
+  return (
+    exercises &&
+    exercises.map((exercise, index) => {
+      const renderItem = () => {
+        console.log(`Rendering exercise screen for day ${day}, index ${index}`);
+        const yOffset = yOffsets[index] || exercises
+          .slice(0, index)
+          .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
+        console.log("yOffset for index", index, ":", yOffset);
+        console.log("ExerciseDay exercises:", exercises);
+        return (
+          <ExerciseScreen
+            key={`${day}_${index}`}
+            day={day}
+            index={index}
+            exerciseName={exercise.exerciseName}
+            yOffset={yOffset}
+            onToggleAdvanced={() => handleToggleAdvanced(day, index)}
+            expanded={expandedIndex === index}
+            onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
+            updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
+          />
+        );
+      };
+
+      const renderRightActions = () => (
+        <View style={styles.rowBack}>
+          <TouchableOpacity
+            style={styles.deleteBtn}
+            onPress={() => handleDeleteExercise(index)}
+          >
+            <Text style={styles.deleteText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       );
-    });
-  };
+
+      return (
+        <Swipeable
+          key={index}
+          renderRightActions={renderRightActions}
+        >
+          {renderItem()}
+        </Swipeable>
+      );
+    })
+  );
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -87,7 +113,7 @@ const ExerciseDay = ({
             }}
             onPress={handleAddExercise}
           >
-            <Text style={{ color: 'white', bottom: 170, left: 40, }}>Add Exercise</Text>
+            <Text style={{ color: 'white', left: 60, }}>Add Exercise</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{
@@ -97,7 +123,7 @@ const ExerciseDay = ({
             }}
             onPress={handleGoBack}
           >
-            <Text style={{ color: 'white', bottom: 160, right: 15, }}>Go Back</Text>
+            <Text style={{ color: 'white', left: 5, }}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -124,6 +150,32 @@ const styles = StyleSheet.create({
       color: '#fff',
       top: 180,
       left: 20,
+    },
+    rowFront: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 'auto',
+      marginBottom: 15,
+      backgroundColor: '#25292e',
+    },
+    rowBack: {
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      flexDirection: 'row',
+      height: 'auto',
+      marginBottom: 15,
+      backgroundColor: '#25292e',
+    },
+    deleteBtn: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 75,
+      height: '100%',
+      backgroundColor: 'red',
+    },
+    deleteText: {
+      color: 'white',
+      fontWeight: '600',
     },
   });
   
