@@ -32,9 +32,9 @@ export default function SplitsButton({ label, onPress, isEditing, onUpdateLabel,
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   buttonContainer: {
-    width: 350,
+    width: 380,
     height: 68,
     marginHorizontal: 20,
     alignItems: 'center',
@@ -43,20 +43,20 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'absolute',
-    top: 40,
-    left: 10,
-    padding: 10,
+    width: '100%',
+    height: '100%',
+    padding: 18,
     backgroundColor: '#1e2227',
-    borderRadius: 5,
+    borderRadius: 10,
   },
   buttonText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
   },
   deleteButton: {
     position: 'absolute',
-    top: 40,
+    top: 17,
     right: 10,
     backgroundColor: 'red',
     paddingHorizontal: 10,

@@ -146,7 +146,7 @@ return (
         }}
         onPress={handleGoBack}
       >
-        <Text style={styles.goBackText}>{"\u003C"} Go Back</Text>
+        <Text style={styles.goBackText}>{"\u003C"} Your Split</Text>
       </TouchableOpacity>
     </View>
     <View

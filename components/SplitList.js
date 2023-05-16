@@ -1,12 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import SplitsButton from './SplitsButton';
+import { AntDesign } from '@expo/vector-icons'; 
 
 const SplitList = ({ onViewChange, splitButtons, onSplitButtonDelete, onSplitButtonLabelUpdate, onCreateNewSplitButton, onToggleEditingLabels, isEditingLabels }) => {
   return (
-    <View style={{ alignItems: 'flex-start' }}>
+    <View style={{ alignItems: 'flex-start', right: 30, top: 50, }}>
+        <TouchableOpacity
+        style={{
+          alignSelf: 'flex-start',
+        }}
+        onPress={() => onViewChange('mainMenu')}
+      >
+        <Text style={styles.goBackText}>{"\u003C"} Home</Text>
+      </TouchableOpacity>
       {splitButtons.map((splitButton, index) => (
-        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View key={index} style={{ flexDirection: 'row', alignItems: 'center', }}>
           <SplitsButton
             label={splitButton.label}
             onPress={splitButton.onPress}
@@ -32,10 +41,21 @@ const SplitList = ({ onViewChange, splitButtons, onSplitButtonDelete, onSplitBut
         label="Create Another Day"
         onPress={onCreateNewSplitButton}
       />
-      <TouchableOpacity onPress={onToggleEditingLabels}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff', top: 150, left: 35, }}>{isEditingLabels ? 'Done' : 'Edit Buttons'}</Text>
+      <TouchableOpacity onPress={onToggleEditingLabels} style={{ top: 140, left: 40 }}>
+        <View style={{ alignItems: 'center' }}>
+          {isEditingLabels ? (
+            <>
+              <AntDesign name="check" size={24} color="#355C7D" />
+              <Text style={{ fontSize: 10, color: '#355C7D' }}>Done</Text>
+            </>
+          ) : (
+            <>
+              <AntDesign name="edit" size={24} color="#355C7D" />
+              <Text style={{ fontSize: 10, color: '#355C7D' }}>Edit</Text>
+            </>
+          )}
+        </View>
       </TouchableOpacity>
-      <SplitsButton label="Go back" onPress={() => onViewChange('mainMenu')} />
     </View>
   );
 };
@@ -46,6 +66,15 @@ const styles = StyleSheet.create({
       top: 50,
       left: 20,
       alignItems: 'flex-start',
+    },
+    goBackText: {
+      position: 'absolute',
+      bottom: 30,
+      left: 25,
+      fontSize: 18,
+      height: 20,
+      width: 90,
+      color: '#355C7D',
     },
   });
 

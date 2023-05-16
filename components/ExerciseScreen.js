@@ -12,6 +12,7 @@ import {
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ExerciseStyles from './ExerciseStyles';
+
 import { scale } from './utils';
 
 const ExerciseScreen = ({
@@ -169,6 +170,7 @@ const ExerciseScreen = ({
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.exerciseContainer}>
       <View style={[styles.bodyContainer, { marginTop: yOffset[index] || 150 }]}>
         <TextInput
           style={ExerciseStyles.exerciseName}
@@ -185,6 +187,7 @@ const ExerciseScreen = ({
             <TextInput
             style={ExerciseStyles.lastSetText} 
             value={reps}
+            placeholder="reps"
             onChangeText={setReps}
             keyboardType="numeric" 
             returnKeyType="done"></TextInput>
@@ -196,6 +199,7 @@ const ExerciseScreen = ({
             <TextInput
             style={ExerciseStyles.LastWeightText}
             value={weight}
+            placeholder="kg"
             onChangeText={setWeight}
             keyboardType="numeric"
             returnKeyType="done">
@@ -227,7 +231,7 @@ const ExerciseScreen = ({
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Switch
                 trackColor={{ false: "#767577", true: "#355C7D" }}
-                thumbColor={isEnabled ? "#030303" : "#f4f3f4"}
+                thumbColor={isEnabled ? "white" : "white"}
                 onValueChange={toggleSwitch}
                 value={isEnabled}
               />
@@ -278,6 +282,7 @@ const ExerciseScreen = ({
         </View>
       )}
       </View>
+      </View>
     </TouchableWithoutFeedback>
 );
 };
@@ -304,6 +309,19 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginVertical: 5,
+  },
+  exerciseContainer: {
+    width: 400,
+    height: 180,
+    marginHorizontal: 0,
+    alignItems: 'left',
+    justifyContent: 'center',
+    padding: 3,
+    backgroundColor: '#1e2227',
+    borderRadius: 10,
+    paddingTop: 30,
+    paddingLeft: 5,
+    marginBottom: 10,
   },
 });
 
