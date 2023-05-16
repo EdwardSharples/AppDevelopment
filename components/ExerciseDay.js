@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Swipeable } from 'react-native-gesture-handler';
+import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 
 import ExerciseScreen from './ExerciseScreen';
 
@@ -27,9 +29,15 @@ const ExerciseDay = ({
   localExerciseName,
   exerciseUpdates,
   handleUpdateYOffsets,
+  handleDeleteExercise,
 }) => {
-  console.log('Current view in ExerciseDay:', day);
-  console.log('Current exercises in ExerciseDay:', exercises);
+  const [deletedExercises, setDeletedExercises] = useState([]);
+
+
+  const handleDeleteExerciseWithDay = (index) => {
+    handleDeleteExercise(day, index);
+    setDeletedExercises((prevDeletedExercises) => [...prevDeletedExercises, index]);
+  };
 
   useEffect(() => {
     if (
@@ -39,26 +47,22 @@ const ExerciseDay = ({
       handleUpdateYOffsets(Array(exerciseScreens[day]?.exercises.length || 0).fill(0));
     }
   }, [exerciseScreens, day, exerciseUpdates, handleUpdateYOffsets, yOffsets]);
-
-  const handleDeleteExercise = (index) => {
-    console.log(`Deleting exercise for day ${day}, index ${index}`);
-    // Add your delete logic here
-  };
+  
 
 const renderExerciseScreens = () => {
   return (
     exercises &&
-    exercises.map((exercise, index) => {
+    exercises
+    .map((exercise, index) => {
+      if (exercise.deleted) return null;
       const renderItem = () => {
         console.log(`Rendering exercise screen for day ${day}, index ${index}`);
         const yOffset = yOffsets[index] || exercises
           .slice(0, index)
           .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
-        console.log("yOffset for index", index, ":", yOffset);
-        console.log("ExerciseDay exercises:", exercises);
         return (
           <ExerciseScreen
-            key={`${day}_${index}`}
+            key={`${day}_${exercise.exerciseName}_${index}`}
             day={day}
             index={index}
             exerciseName={exercise.exerciseName}
@@ -75,7 +79,7 @@ const renderExerciseScreens = () => {
         <View style={styles.rowBack}>
           <TouchableOpacity
             style={styles.deleteBtn}
-            onPress={() => handleDeleteExercise(index)}
+            onPress={() => handleDeleteExerciseWithDay(index)}
           >
             <Text style={styles.deleteText}>Delete</Text>
           </TouchableOpacity>
@@ -94,41 +98,69 @@ const renderExerciseScreens = () => {
   );
 };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={{ flex: 1, right: 50, }}
-        contentContainerStyle={{ paddingHorizontal: 50 }}
-        horizontal={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
+return (
+  <SafeAreaView style={styles.container}>
+    <View
+      style={{
+        backgroundColor: '#25292e',
+        height: 90, // Adjust the height as needed
+        width: '100%',
+        position: 'absolute',
+        zIndex: 1,
+        top: 0,
+      }}
+    />
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingHorizontal: 56, flexGrow: 1, alignItems: 'center', left: -50, top: 50 }}
+      horizontal={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={{ minHeight: 1850 }}>
+        {renderExerciseScreens()}
+      </View>
+    </ScrollView>
+    <View
+      style={{
+        position: 'absolute',
+        bottom: 20, 
+        width: '100%', 
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
+        paddingHorizontal: 56, 
+        zIndex: 2,
+      }}
+    >
+      <TouchableOpacity
+        style={{
+          alignSelf: 'flex-end',
+        }}
+        onPress={handleAddExercise}
       >
-        <View style={{ minHeight: 1850 }}>
-          {renderExerciseScreens()}
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-end',
-              marginTop: 20,
-              marginRight: 20,
-            }}
-            onPress={handleAddExercise}
-          >
-            <Text style={{ color: 'white', left: 60, }}>Add Exercise</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              alignSelf: 'flex-start',
-              left: 265,
-              top: 20,
-            }}
-            onPress={handleGoBack}
-          >
-            <Text style={{ color: 'white', left: 5, }}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+        <AntDesign name="pluscircle" size={26} style={styles.addExerciseText} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          alignSelf: 'flex-start',
+        }}
+        onPress={handleGoBack}
+      >
+        <Text style={styles.goBackText}>{"\u003C"} Go Back</Text>
+      </TouchableOpacity>
+    </View>
+    <View
+      style={{
+        backgroundColor: '#25292e', // Use your desired color
+        height: 80, // Adjust the height as needed
+        width: '100%',
+        position: 'absolute',
+        zIndex: 1,
+        bottom: 0,
+      }}
+    />
+  </SafeAreaView>
+  );  
 };
 
 const styles = StyleSheet.create({
@@ -171,11 +203,24 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       width: 75,
       height: '100%',
-      backgroundColor: 'red',
+      backgroundColor: '#C70000',
     },
     deleteText: {
       color: 'white',
       fontWeight: '600',
+    },
+    addExerciseText: {
+      left: 300,
+      bottom: 20,
+      color: '#355C7D',
+    },
+    goBackText: {
+      left: -255,
+      bottom: 800,
+      fontSize: 18,
+      height: 20,
+      width: 90,
+      color: '#355C7D',
     },
   });
   

@@ -149,6 +149,10 @@ export default function App() {
   
     loadExerciseScreens();
   }, []);
+
+  useEffect(() => {
+    console.log("Exercise screens updated:", JSON.stringify(exerciseScreens, null, 2));
+  }, [exerciseScreens]);
   
   
 
@@ -239,6 +243,35 @@ export default function App() {
     );
   };
 
+  const handleDeleteExercise = (day, index) => {
+    console.log(`Deleting exercise for day ${day}, index ${index}`);
+
+    // console.log("Exercise screens before deletion:", JSON.stringify(exerciseScreens, null, 2));
+
+    setExerciseScreens((prevScreens) => {
+      const newScreens = { ...prevScreens };
+  
+      if (newScreens[day]) {
+        newScreens[day].exercises = newScreens[day].exercises.map((exercise, i) =>
+          i === index ? { ...exercise, deleted: true } : exercise
+        );
+      }
+  
+      return newScreens;
+    });
+
+    // console.log("Exercise screens after deletion:", JSON.stringify(exerciseScreens, null, 2));
+  
+    // Remove the exercise data from AsyncStorage
+    AsyncStorage.removeItem(`exercise_${day}_${index}`)
+      .then(() => {
+        console.log(`Exercise data removed for day ${day}, index ${index}`);
+      })
+      .catch((error) => {
+        console.error("Error removing exercise data:", error);
+      });
+  };
+
   const handleGoBack = () => {
     setView('splitList');
   };
@@ -299,6 +332,7 @@ export default function App() {
                     updateExerciseName={(newName, index) => updateExerciseName(view, newName, index)}
                     exerciseUpdates={exerciseUpdates}
                     handleUpdateYOffsets={handleUpdateYOffsets}
+                    handleDeleteExercise={handleDeleteExercise}
                   />
                 );
               }

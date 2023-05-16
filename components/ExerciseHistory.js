@@ -67,8 +67,9 @@ const ExerciseHistory = ( {onGoBack} ) => {
           <View style={styles.expandedContainer}>
             {item.data.map((exercise, exerciseIndex) => (
               <Text key={exerciseIndex} style={styles.itemText}>
-                {exercise.reps} for {exercise.weight}
-                {exerciseIndex === 0 ? " (Current)" : " (Previous)"}
+                {exercise.reps} for {exercise.weight} on {new Date(exercise.date).toLocaleDateString()}
+                {exercise.RorL ? ` (${exercise.RorL})` : ""}
+                {exerciseIndex === item.data.length - 1 ? " (Current)" : " (Previous)"}
               </Text>
             ))}
           </View>
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10, 
     borderRadius: 5,
     marginBottom: 10,
-    width: '95%', 
+    width: '100%', 
   },
   
   expandedText: {

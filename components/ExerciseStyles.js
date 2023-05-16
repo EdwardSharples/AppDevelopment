@@ -1,10 +1,16 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+import { scale } from './utils';
+
+const screenWidth = Dimensions.get('window').width;
+
+const textColor = '#EDEDED';
 
 const styles = StyleSheet.create({
   exerciseName: {
-    fontSize: 18,
+    fontSize: scale(18, 1.2),
     fontWeight: 'bold',
     marginBottom: 10,
+    color: textColor,
   },
   lastSetContainer: {
     flexDirection: 'row',
@@ -12,26 +18,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: 150,
     height: 40,
+    color: textColor,
   },
   lastSetLabel: {
-    fontSize: 12,
+    fontSize: scale(12, 1.2),
     marginRight: 5,
+    color: textColor,
   },
   lastSetTextContainer: {
-    flex: 1,
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
+    color: textColor,
+    width: screenWidth * 0.13,
   },
   lastSetText: {
-    fontSize: 16,
+    fontSize: scale(16, 1.2),
+    color: textColor,
   },
   lastSetFor: {
     position: 'absolute',
-    left: 112.5,
+    left: 125,
+    color: textColor,
   },
   LastWeightText: {
-    fontSize: 16,
+    fontSize: scale(16, 1.2),
+    color: textColor,
   },
   saveButtonContainer: {
     backgroundColor: 'grey',
@@ -42,7 +54,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: 'black',
-    fontSize: 18,
+    fontSize: scale(18, 1.2),
     fontWeight: 'bold',
   },
   advancedButton: {
@@ -53,11 +65,11 @@ const styles = StyleSheet.create({
     marginTop: 7,
   },
   lastWeightTextContainer: {
-    flex: 1,
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
     left: 40,
+    width: screenWidth * 0.14,
   },
   RorLcontainer: {
     position: 'absolute',
@@ -65,12 +77,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    left: 200,
-    top: 37,
+    left: 225,
+    top: 38,
+    width: 55,
+    height: 35,
   },
   RorLText: {
     fontSize: 16,
     color: 'black',
+  },
+  toFailureText: {
+    marginLeft: 10,
+    color: textColor,
+  },
+  staticHoldTimeLabel: {
+    marginBottom: 5,
+    color: textColor,
+  },
+  dicentricTimeLabel: {
+    marginBottom: 5,
+    color: textColor,
+  },
+  notesLabel: {
+    marginBottom: 5,
+    color: textColor,
   },
 });
 
