@@ -30,14 +30,22 @@ const ExerciseDay = ({
   exerciseUpdates,
   handleUpdateYOffsets,
   handleDeleteExercise,
+  showAdvanced,
 }) => {
   const [deletedExercises, setDeletedExercises] = useState([]);
+
+  const exerciseHeight = showAdvanced ? 530 : 330;
 
 
   const handleDeleteExerciseWithDay = (index) => {
     handleDeleteExercise(day, index);
     setDeletedExercises((prevDeletedExercises) => [...prevDeletedExercises, index]);
   };
+
+  const handleHistoryButton = () => {
+    navigation.navigate('ExerciseHistory');
+  };
+  
 
   useEffect(() => {
     if (
@@ -112,12 +120,12 @@ return (
     />
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={{ paddingHorizontal: 56, flexGrow: 1, alignItems: 'center', left: -50, top: 50 }}
+      contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
       horizontal={false}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
     >
-      <View style={{ minHeight: 1850 }}>
+      <View style={{ minHeight: exercises ? (exercises.length - deletedExercises.length) * exerciseHeight : 0 }}>
         {renderExerciseScreens()}
       </View>
     </ScrollView>
@@ -140,6 +148,16 @@ return (
       >
         <AntDesign name="pluscircle" size={26} style={styles.addExerciseText} />
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{
+          alignSelf: 'flex-end',
+        }}
+        onPress={handleHistoryButton}
+      >
+        <FontAwesome name="history" size={28} color="#355C7D" style={styles.historyButton} />
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={{
           alignSelf: 'flex-start',
@@ -204,6 +222,7 @@ const styles = StyleSheet.create({
       width: 75,
       height: '100%',
       backgroundColor: '#C70000',
+      borderRadius: 20,
     },
     deleteText: {
       color: 'white',
@@ -211,16 +230,21 @@ const styles = StyleSheet.create({
     },
     addExerciseText: {
       left: 300,
-      bottom: 20,
+      bottom: 17,
       color: '#355C7D',
     },
     goBackText: {
-      left: -255,
+      left: -245,
       bottom: 800,
       fontSize: 18,
       height: 20,
       width: 90,
       color: '#355C7D',
+      paddingRight: 100,
+    },
+    historyButton: {
+      left: -125,
+      bottom: 17,
     },
   });
   

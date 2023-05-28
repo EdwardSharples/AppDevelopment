@@ -1,5 +1,3 @@
-
-// There are imports for packages i use
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import {
@@ -7,6 +5,9 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+import { TransitionPresets } from '@react-navigation/stack';
 
 
 import MainMenu from './components/MainMenu';
@@ -14,6 +15,32 @@ import SplitList from './components/SplitList';
 import ExerciseHistory from './components/ExerciseHistory';
 import ExerciseDay from './components/ExerciseDay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoadingScreen from './components/LoadingScreen';
+
+const Stack = createSharedElementStackNavigator();
+
+const MyStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName="ExerciseDay"
+      screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        ...TransitionPresets.SlideFromRightIOS,
+      }}
+    >
+      <Stack.Screen
+        name="ExerciseDay"
+        component={ExerciseDay}
+      />
+      <Stack.Screen
+        name="ExerciseHistory"
+        component={ExerciseHistory}
+      />
+      {/* Add more screens as necessary */}
+    </Stack.Navigator>
+  );
+};
 
 
 
@@ -153,6 +180,17 @@ export default function App() {
   useEffect(() => {
     console.log("Exercise screens updated:", JSON.stringify(exerciseScreens, null, 2));
   }, [exerciseScreens]);
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      // replace this with your actual data loading logic
+      await new Promise((resolve) => setTimeout(resolve, 2000)); 
+      setIsLoading(false);
+    };
+  
+    loadInitialData();
+  }, []);
+  
   
   
 
@@ -275,6 +313,10 @@ export default function App() {
   const handleGoBack = () => {
     setView('splitList');
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   const renderView = () => {
     if (isLoading) {

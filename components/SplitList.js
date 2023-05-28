@@ -41,21 +41,17 @@ const SplitList = ({ onViewChange, splitButtons, onSplitButtonDelete, onSplitBut
         label="Create Another Day"
         onPress={onCreateNewSplitButton}
       />
-      <TouchableOpacity onPress={onToggleEditingLabels} style={{ top: 140, left: 40 }}>
-        <View style={{ alignItems: 'center' }}>
-          {isEditingLabels ? (
-            <>
-              <AntDesign name="check" size={24} color="#355C7D" />
-              <Text style={{ fontSize: 10, color: '#355C7D' }}>Done</Text>
-            </>
-          ) : (
-            <>
-              <AntDesign name="edit" size={24} color="#355C7D" />
-              <Text style={{ fontSize: 10, color: '#355C7D' }}>Edit</Text>
-            </>
-          )}
-        </View>
-      </TouchableOpacity>
+      <View style={{ position: 'absolute', top: 740, left: 40 }}>
+          <TouchableOpacity onPress={onToggleEditingLabels}>
+              <View style={{ alignItems: 'center' }}>
+                  {isEditingLabels ? (
+                      <AntDesign name="check" size={26} color="#355C7D" />
+                  ) : (
+                      <AntDesign name="edit" size={26} color="#355C7D"/>
+                  )}
+              </View>
+          </TouchableOpacity>
+      </View>
     </View>
   );
 };

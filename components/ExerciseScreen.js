@@ -165,12 +165,14 @@ const ExerciseScreen = ({
   }, [localExerciseName]);
 
   const lastSet = `${reps || 0} x ${weight || 0}`;
-
-
+/*
+<View style={styles.exerciseContainer}>
+</View>
+*/
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.exerciseContainer}>
+      
       <View style={[styles.bodyContainer, { marginTop: yOffset[index] || 150 }]}>
         <TextInput
           style={ExerciseStyles.exerciseName}
@@ -282,7 +284,7 @@ const ExerciseScreen = ({
         </View>
       )}
       </View>
-      </View>
+      
     </TouchableWithoutFeedback>
 );
 };
@@ -297,14 +299,17 @@ const styles = StyleSheet.create({
   },
   bodyContainer: {
     position: 'relative',
-    left: 5,
+    left: 0,
     alignItems: 'flex-start',
-    paddingBottom: scale(10, 1.3),
+    paddingBottom: 30,
     marginBottom: scale(-150, 0.9), // change since its causing issues
     marginTop: scale(100, 1.3),
-    width: 300,
-    bottom: 400,
+    width: 400,
     bottom: 150,
+    backgroundColor: '#1e2227',
+    borderRadius: 20,
+    paddingTop: 30,
+    paddingLeft: 15,
   },
   label: {
     fontWeight: 'bold',
