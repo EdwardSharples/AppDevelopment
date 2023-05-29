@@ -22,25 +22,22 @@ const Stack = createSharedElementStackNavigator();
 const MyStack = () => {
   return (
     <Stack.Navigator
-      initialRouteName="ExerciseDay"
+      initialRouteName="MainMenu"
       screenOptions={{
         gestureEnabled: true,
         gestureDirection: 'horizontal',
         ...TransitionPresets.SlideFromRightIOS,
       }}
     >
-      <Stack.Screen
-        name="ExerciseDay"
-        component={ExerciseDay}
-      />
-      <Stack.Screen
-        name="ExerciseHistory"
-        component={ExerciseHistory}
-      />
+      <Stack.Screen name="MainMenu" component={MainMenu} />
+      <Stack.Screen name="ExerciseDay" component={ExerciseDay} />
+      <Stack.Screen name="ExerciseHistory" component={ExerciseHistory} />
+      <Stack.Screen name="SplitList" component={SplitList} />
       {/* Add more screens as necessary */}
     </Stack.Navigator>
   );
 };
+
 
 
 
