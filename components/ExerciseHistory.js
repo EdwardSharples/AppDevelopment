@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -89,43 +90,31 @@ const ExerciseHistory = ( {onGoBack} ) => {
   
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Exercise History</Text>
-      <FlatList
-        data={historyData}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-      />
-      <TouchableOpacity
-        style={{
-          alignSelf: 'center',
-          bottom: 40,
-          backgroundColor: '#355C7D',
-          paddingHorizontal: 15,
-          paddingVertical: 10,
-          borderRadius: 5,
-        }}
-        onPress={onGoBack}
-      >
-        <Text style={{ color: 'white' }}>Go back</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-      style={{
-        alignSelf: 'center',
-        bottom: 30,
-        backgroundColor: 'red',
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 5,
-        marginTop: 10, // Add some margin to separate the buttons
-      }}
-      onPress={handleClearAsyncStorage}
-    >
-      <Text style={{ color: 'white' }}>Clear AsyncStorage</Text>
-    </TouchableOpacity>
-    </View>
+    <>
+      <View style={styles.goBackContainer}>
+        <TouchableOpacity onPress={onGoBack}>
+          <Text style={styles.goBackText}>{"\u003C"} Home</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>Exercise History</Text>
+        <FlatList
+          data={historyData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          style={{ marginTop: 60 }}
+        />
+        <TouchableOpacity
+          onPress={handleClearAsyncStorage}
+          style={{ position: 'absolute', bottom: 35, right: 30 }} // adjust bottom and right values as needed
+        >
+          <Icon name="delete" size={24} color="#355C7D" />
+        </TouchableOpacity>
+      </View>
+    </>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -142,18 +131,21 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     backgroundColor: 'white',
-    paddingHorizontal: 100,
-    paddingVertical: 10,
+    paddingHorizontal: 160,
+    paddingVertical: 17.5,
     borderRadius: 10,
     marginBottom: 10,
     width: '100%',
+    backgroundColor: '#1e2227'
   },
   itemText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '500',
+    color: 'white',
+    textAlign: 'left',
   },
   expandedContainer: {
     backgroundColor: '#3c4043',
@@ -162,12 +154,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     width: '100%', 
+    backgroundColor: '#355C7D',
   },
-  
   expandedText: {
     fontSize: 14,
     fontWeight: '500',
     color: 'white',
+  },
+  goBackContainer: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 1,
+  },
+  goBackText: {
+    fontSize: 18,
+    color: '#355C7D',
   },
 });
 

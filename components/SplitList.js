@@ -41,7 +41,7 @@ const SplitList = ({ onViewChange, splitButtons, onSplitButtonDelete, onSplitBut
         label="Create Another Day"
         onPress={onCreateNewSplitButton}
       />
-      <View style={{ position: 'absolute', top: 740, left: 40 }}>
+      <View style={{ position: 'absolute', top: 733, left: 43 }}>
           <TouchableOpacity onPress={onToggleEditingLabels}>
               <View style={{ alignItems: 'center' }}>
                   {isEditingLabels ? (

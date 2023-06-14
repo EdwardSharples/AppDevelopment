@@ -19,28 +19,6 @@ import LoadingScreen from './components/LoadingScreen';
 
 const Stack = createSharedElementStackNavigator();
 
-const MyStack = () => {
-  return (
-    <Stack.Navigator
-      initialRouteName="MainMenu"
-      screenOptions={{
-        gestureEnabled: true,
-        gestureDirection: 'horizontal',
-        ...TransitionPresets.SlideFromRightIOS,
-      }}
-    >
-      <Stack.Screen name="MainMenu" component={MainMenu} />
-      <Stack.Screen name="ExerciseDay" component={ExerciseDay} />
-      <Stack.Screen name="ExerciseHistory" component={ExerciseHistory} />
-      <Stack.Screen name="SplitList" component={SplitList} />
-      {/* Add more screens as necessary */}
-    </Stack.Navigator>
-  );
-};
-
-
-
-
 export default function App() {
   // State variable to control which view is displayed
   const [view, setView] = useState('mainMenu');
@@ -187,8 +165,6 @@ export default function App() {
   
     loadInitialData();
   }, []);
-  
-  
   
 
   const handleToggleAdvanced = (day, index) => {
