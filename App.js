@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
-import { TransitionPresets } from '@react-navigation/stack';
+import { Animated } from 'react-native';
 
 
 import MainMenu from './components/MainMenu';
@@ -17,6 +17,7 @@ import ExerciseDay from './components/ExerciseDay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingScreen from './components/LoadingScreen';
 
+// Use the createSharedElementStackNavigator instead of createStackNavigator
 const Stack = createSharedElementStackNavigator();
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
   const [yOffsets, setYOffsets] = useState(Array(exerciseScreens[view]?.exercises.length || 0).fill(0));
   const [exerciseUpdates, setExerciseUpdates] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [opacity] = useState(new Animated.Value(1));
 
   const updateExerciseName = async (day, newName, index) => {
     console.log(`Updating exercise name for day ${day}, newName ${newName}, index ${index}`);
@@ -287,72 +289,107 @@ export default function App() {
     setView('splitList');
   };
 
+  const handleHistoryButton = () => {
+    setView('exerciseHistory');
+  };
+
+  const animatedSetView = (newView) => {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true
+    }).start(() => {
+      setView(newView);
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true
+      }).start();
+    });
+  };
+
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   const renderView = () => {
-    if (isLoading) {
-      return <ActivityIndicator size="large" color="#FFFFFF" />;
-    }
+    let currentView;
     switch (true) {
       case view === 'mainMenu':
-        return <MainMenu onViewChange={setView} />;
+        currentView = <MainMenu onViewChange={animatedSetView} />;
+        break;
 
       case view === 'exerciseHistory':
-        return <ExerciseHistory onGoBack={() => setView('mainMenu')} />;
+        currentView = <ExerciseHistory onGoBack={() => animatedSetView('mainMenu')} />;
+        break;
 
-        case view === 'splitList':
-          return (
-            <View style={styles.bodyContainer}>
-              <SplitList
-                onViewChange={setView}
-                splitButtons={splitButtons}
-                onSplitButtonDelete={deleteSplitButton}
-                onSplitButtonLabelUpdate={updateSplitButtonLabel}
-                onCreateNewSplitButton={createNewSplitButton}
-                onToggleEditingLabels={toggleEditingLabels}
-                isEditingLabels={isEditingLabels}
-              />
-            </View>
-          );
-    
-        case view === 'split1':
-          return (
+      case view === 'splitList':
+        currentView = (
+          <View style={styles.bodyContainer}>
             <SplitList
-              onViewChange={setView}
+              onViewChange={animatedSetView}
               splitButtons={splitButtons}
               onSplitButtonDelete={deleteSplitButton}
               onSplitButtonLabelUpdate={updateSplitButtonLabel}
               onCreateNewSplitButton={createNewSplitButton}
               onToggleEditingLabels={toggleEditingLabels}
               isEditingLabels={isEditingLabels}
-              yOffset={yOffset}
             />
-          );
+          </View>
+        );
+        break;
+    
+      case view === 'split1':
+        currentView = (
+          <SplitList
+            onViewChange={animatedSetView}
+            splitButtons={splitButtons}
+            onSplitButtonDelete={deleteSplitButton}
+            onSplitButtonLabelUpdate={updateSplitButtonLabel}
+            onCreateNewSplitButton={createNewSplitButton}
+            onToggleEditingLabels={toggleEditingLabels}
+            isEditingLabels={isEditingLabels}
+            yOffset={yOffset}
+          />
+        );
+        break;
           
-            default:
-              if (view.startsWith('day')) {
-                return (
-                  <ExerciseDay
-                    day={view}
-                    exercises={exerciseScreens[view]?.exercises}
-                    handleAddExercise={() => handleAddExercise(view)}
-                    handleGoBack={handleGoBack}
-                    handleToggleAdvanced={(index) => handleToggleAdvanced(view, index)}
-                    expandedIndex={expandedIndex}
-                    advancedOffset={advancedOffset}
-                    exerciseScreens={exerciseScreens}
-                    yOffsets={yOffsets}
-                    updateExerciseName={(newName, index) => updateExerciseName(view, newName, index)}
-                    exerciseUpdates={exerciseUpdates}
-                    handleUpdateYOffsets={handleUpdateYOffsets}
-                    handleDeleteExercise={handleDeleteExercise}
-                  />
-                );
-              }
-        }
-      };
+        default:
+          if (view.startsWith('day')) {
+            currentView = (
+              <ExerciseDay
+                day={view}
+                exercises={exerciseScreens[view]?.exercises}
+                handleAddExercise={() => handleAddExercise(view)}
+                handleHistoryButton={handleHistoryButton}
+                handleGoBack={handleGoBack}
+                handleToggleAdvanced={(index) => handleToggleAdvanced(view, index)}
+                expandedIndex={expandedIndex}
+                advancedOffset={advancedOffset}
+                exerciseScreens={exerciseScreens}
+                yOffsets={yOffsets}
+                updateExerciseName={(newName, index) => updateExerciseName(view, newName, index)}
+                exerciseUpdates={exerciseUpdates}
+                handleUpdateYOffsets={handleUpdateYOffsets}
+                handleDeleteExercise={handleDeleteExercise}
+              />
+            );
+          }
+      }
+    
+      return (
+        <Animated.View style={{ 
+          opacity, 
+          position: 'absolute', 
+          top: 0, 
+          bottom: 0, 
+          left: 0, 
+          right: 0
+        }}>
+          {currentView}
+        </Animated.View>
+      );
+    };
 
   return (
     <View style={styles.container}>

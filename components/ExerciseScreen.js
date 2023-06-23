@@ -189,7 +189,7 @@ const ExerciseScreen = ({
             <TextInput
             style={ExerciseStyles.lastSetText} 
             value={reps}
-            placeholder="reps"
+            placeholder="kg"
             onChangeText={setReps}
             keyboardType="numeric" 
             returnKeyType="done"></TextInput>
@@ -201,7 +201,7 @@ const ExerciseScreen = ({
             <TextInput
             style={ExerciseStyles.LastWeightText}
             value={weight}
-            placeholder="kg"
+            placeholder="reps"
             onChangeText={setWeight}
             keyboardType="numeric"
             returnKeyType="done">

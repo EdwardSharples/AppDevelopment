@@ -1,11 +1,25 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated  } from 'react-native';
 import SplitsButton from './SplitsButton';
 import { AntDesign } from '@expo/vector-icons'; 
 
 const SplitList = ({ onViewChange, splitButtons, onSplitButtonDelete, onSplitButtonLabelUpdate, onCreateNewSplitButton, onToggleEditingLabels, isEditingLabels }) => {
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;  // Initial value for opacity: 0
+
+  useEffect(() => {
+    Animated.timing(
+      fadeAnim,
+      {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }
+    ).start();
+  }, [fadeAnim]);
+  
   return (
-    <View style={{ alignItems: 'flex-start', right: 30, top: 50, }}>
+    <Animated.View style={{ alignItems: 'flex-start', right: 30, top: 50, opacity: fadeAnim }}>
         <TouchableOpacity
         style={{
           alignSelf: 'flex-start',
@@ -52,7 +66,7 @@ const SplitList = ({ onViewChange, splitButtons, onSplitButtonDelete, onSplitBut
               </View>
           </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 

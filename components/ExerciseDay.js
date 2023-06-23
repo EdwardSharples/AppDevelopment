@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   View,
   Text,
   TouchableOpacity,
-  StyleSheet
+  StyleSheet,
+  Animated,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -31,8 +32,19 @@ const ExerciseDay = ({
   handleUpdateYOffsets,
   handleDeleteExercise,
   showAdvanced,
+  handleHistoryButton,
 }) => {
   const [deletedExercises, setDeletedExercises] = useState([]);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+
+  React.useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true
+    }).start();
+  }, []);
 
   const exerciseHeight = showAdvanced ? 530 : 330;
 
@@ -40,10 +52,6 @@ const ExerciseDay = ({
   const handleDeleteExerciseWithDay = (index) => {
     handleDeleteExercise(day, index);
     setDeletedExercises((prevDeletedExercises) => [...prevDeletedExercises, index]);
-  };
-
-  const handleHistoryButton = () => {
-    navigation.navigate('ExerciseHistory');
   };
   
 
@@ -118,8 +126,8 @@ return (
         top: 0,
       }}
     />
-    <ScrollView
-      style={{ flex: 1 }}
+    <Animated.ScrollView
+      style={{ ...styles.scrollView, opacity: fadeAnim, flex: 1 }}
       contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
       horizontal={false}
       showsHorizontalScrollIndicator={false}
@@ -128,8 +136,8 @@ return (
       <View style={{ minHeight: exercises ? (exercises.length - deletedExercises.length) * exerciseHeight : 0 }}>
         {renderExerciseScreens()}
       </View>
-    </ScrollView>
-    <View
+    </Animated.ScrollView>
+    <Animated.View
       style={{
         position: 'absolute',
         bottom: 20, 
@@ -138,6 +146,7 @@ return (
         justifyContent: 'space-between',
         paddingHorizontal: 56, 
         zIndex: 2,
+        opacity: fadeAnim,
       }}
     >
       <TouchableOpacity
@@ -166,7 +175,7 @@ return (
       >
         <Text style={styles.goBackText}>{"\u003C"} Your Split</Text>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
     <View
       style={{
         backgroundColor: '#25292e', // Use your desired color
