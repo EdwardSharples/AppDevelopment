@@ -12,6 +12,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { Swipeable } from 'react-native-gesture-handler';
 import { FontAwesome } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 
 import ExerciseScreen from './ExerciseScreen';
 
@@ -65,7 +66,7 @@ const ExerciseDay = ({
   }, [exerciseScreens, day, exerciseUpdates, handleUpdateYOffsets, yOffsets]);
   
 
-const renderExerciseScreens = () => {
+const renderExerciseScreens = ({ item, index, drag, isActive }) => {
   return (
     exercises &&
     exercises
@@ -77,17 +78,22 @@ const renderExerciseScreens = () => {
           .slice(0, index)
           .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
         return (
-          <ExerciseScreen
-            key={`${day}_${exercise.exerciseName}_${index}`}
-            day={day}
-            index={index}
-            exerciseName={exercise.exerciseName}
-            yOffset={yOffset}
-            onToggleAdvanced={() => handleToggleAdvanced(day, index)}
-            expanded={expandedIndex === index}
-            onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
-            updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
-          />
+          <Swipeable
+            key={index}
+            renderRightActions={renderRightActions}
+          >
+            <ExerciseScreen
+              key={`${day}_${exercise.exerciseName}_${index}`}
+              day={day}
+              index={index}
+              exerciseName={exercise.exerciseName}
+              yOffset={yOffset}
+              onToggleAdvanced={() => handleToggleAdvanced(day, index)}
+              expanded={expandedIndex === index}
+              onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
+              updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
+            />
+          </Swipeable>
         );
       };
 
@@ -126,7 +132,17 @@ return (
         top: 0,
       }}
     />
-    <Animated.ScrollView
+
+    <DraggableFlatList
+          style={{ opacity: fadeAnim, flex: 1 }}
+          contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
+          data={exercises.filter(e => !e.deleted)}
+          renderItem={renderExerciseScreens}
+          keyExtractor={(item, index) => `draggable-item-${index}`}
+          onDragEnd={({ data }) => setExercises(data)}
+        />
+
+    <Animated.ScrollView 
       style={{ ...styles.scrollView, opacity: fadeAnim, flex: 1 }}
       contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
       horizontal={false}

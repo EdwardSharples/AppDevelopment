@@ -265,9 +265,7 @@ export default function App() {
       const newScreens = { ...prevScreens };
   
       if (newScreens[day]) {
-        newScreens[day].exercises = newScreens[day].exercises.map((exercise, i) =>
-          i === index ? { ...exercise, deleted: true } : exercise
-        );
+        newScreens[day].exercises = newScreens[day].exercises.filter((_, i) => i !== index);
       }
   
       return newScreens;
