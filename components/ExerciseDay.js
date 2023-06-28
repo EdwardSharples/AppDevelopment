@@ -36,7 +36,6 @@ const ExerciseDay = ({
   handleHistoryButton,
 }) => {
   const [deletedExercises, setDeletedExercises] = useState([]);
-
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
 
   React.useEffect(() => {
@@ -66,144 +65,85 @@ const ExerciseDay = ({
   }, [exerciseScreens, day, exerciseUpdates, handleUpdateYOffsets, yOffsets]);
   
 
-const renderExerciseScreens = ({ item, index, drag, isActive }) => {
-  return (
-    exercises &&
-    exercises
-    .map((exercise, index) => {
-      if (exercise.deleted) return null;
-      const renderItem = () => {
-        console.log(`Rendering exercise screen for day ${day}, index ${index}`);
-        const yOffset = yOffsets[index] || exercises
-          .slice(0, index)
-          .reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0);
-        return (
-          <Swipeable
-            key={index}
-            renderRightActions={renderRightActions}
-          >
-            <ExerciseScreen
-              key={`${day}_${exercise.exerciseName}_${index}`}
-              day={day}
-              index={index}
-              exerciseName={exercise.exerciseName}
-              yOffset={yOffset}
-              onToggleAdvanced={() => handleToggleAdvanced(day, index)}
-              expanded={expandedIndex === index}
-              onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
-              updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
-            />
-          </Swipeable>
-        );
-      };
-
-      const renderRightActions = () => (
-        <View style={styles.rowBack}>
-          <TouchableOpacity
-            style={styles.deleteBtn}
-            onPress={() => handleDeleteExerciseWithDay(index)}
-          >
-            <Text style={styles.deleteText}>Delete</Text>
-          </TouchableOpacity>
-        </View>
-      );
-
-      return (
-        <Swipeable
-          key={index}
-          renderRightActions={renderRightActions}
-        >
-          {renderItem()}
-        </Swipeable>
-      );
-    })
-  );
-};
-
-return (
-  <SafeAreaView style={styles.container}>
-    <View
-      style={{
-        backgroundColor: '#25292e',
-        height: 90, // Adjust the height as needed
-        width: '100%',
-        position: 'absolute',
-        zIndex: 1,
-        top: 0,
-      }}
-    />
-
-    <DraggableFlatList
-          style={{ opacity: fadeAnim, flex: 1 }}
-          contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
-          data={exercises.filter(e => !e.deleted)}
-          renderItem={renderExerciseScreens}
-          keyExtractor={(item, index) => `draggable-item-${index}`}
-          onDragEnd={({ data }) => setExercises(data)}
+  const renderExerciseScreens = ({ item, index, drag, isActive }) => {
+    return (
+      <TouchableOpacity onLongPress={drag}>
+        <ExerciseScreen
+          key={`${day}_${item.exerciseName}_${index}`}
+          day={day}
+          index={index}
+          exerciseName={item.exerciseName}
+          yOffset={yOffsets[index] || exercises.slice(0, index).reduce((acc, _, i) => acc + 165 + (advancedOffset[i] || 0), 0)}
+          onToggleAdvanced={() => handleToggleAdvanced(day, index)}
+          expanded={expandedIndex === index}
+          onSaveSet={(reps, weight) => saveSet(day, reps, weight)}
+          updateExerciseName={(newName) => updateExerciseName(day, newName, index)}
         />
-
-    <Animated.ScrollView 
-      style={{ ...styles.scrollView, opacity: fadeAnim, flex: 1 }}
-      contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
-      horizontal={false}
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={{ minHeight: exercises ? (exercises.length - deletedExercises.length) * exerciseHeight : 0 }}>
-        {renderExerciseScreens()}
-      </View>
-    </Animated.ScrollView>
-    <Animated.View
-      style={{
-        position: 'absolute',
-        bottom: 20, 
-        width: '100%', 
-        flexDirection: 'row', 
-        justifyContent: 'space-between',
-        paddingHorizontal: 56, 
-        zIndex: 2,
-        opacity: fadeAnim,
-      }}
-    >
-      <TouchableOpacity
-        style={{
-          alignSelf: 'flex-end',
-        }}
-        onPress={handleAddExercise}
-      >
-        <AntDesign name="pluscircle" size={26} style={styles.addExerciseText} />
       </TouchableOpacity>
+    );
+  };
 
-      <TouchableOpacity
+  return (
+    <SafeAreaView style={styles.container}>
+      <DraggableFlatList
+        style={{ opacity: fadeAnim, flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 0, flexGrow: 1, alignItems: 'center', top: 50 }}
+        data={exercises.filter(e => !e.deleted)}
+        renderItem={renderExerciseScreens}
+        keyExtractor={(item, index) => `draggable-item-${index}`}
+        onDragEnd={({ data }) => setExercises(data)}
+      />
+      <Animated.View
         style={{
-          alignSelf: 'flex-end',
+          position: 'absolute',
+          bottom: 20,
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          paddingHorizontal: 56,
+          zIndex: 2,
+          opacity: fadeAnim,
         }}
-        onPress={handleHistoryButton}
       >
-        <FontAwesome name="history" size={28} color="#355C7D" style={styles.historyButton} />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            alignSelf: 'flex-end',
+          }}
+          onPress={handleAddExercise}
+        >
+          <AntDesign name="pluscircle" size={26} style={styles.addExerciseText} />
+        </TouchableOpacity>
 
-      <TouchableOpacity
+        <TouchableOpacity
+          style={{
+            alignSelf: 'flex-end',
+          }}
+          onPress={handleHistoryButton}
+        >
+          <FontAwesome name="history" size={28} color="#355C7D" style={styles.historyButton} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            alignSelf: 'flex-start',
+          }}
+          onPress={handleGoBack}
+        >
+          <Text style={styles.goBackText}>{"<"} Your Split</Text>
+        </TouchableOpacity>
+      </Animated.View>
+      <View
         style={{
-          alignSelf: 'flex-start',
+          backgroundColor: '#25292e',
+          height: 80,
+          width: '100%',
+          position: 'absolute',
+          zIndex: 1,
+          bottom: 0,
         }}
-        onPress={handleGoBack}
-      >
-        <Text style={styles.goBackText}>{"\u003C"} Your Split</Text>
-      </TouchableOpacity>
-    </Animated.View>
-    <View
-      style={{
-        backgroundColor: '#25292e', // Use your desired color
-        height: 80, // Adjust the height as needed
-        width: '100%',
-        position: 'absolute',
-        zIndex: 1,
-        bottom: 0,
-      }}
-    />
-  </SafeAreaView>
-  );  
+      />
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
