@@ -370,6 +370,7 @@ export default function App() {
                 exerciseUpdates={exerciseUpdates}
                 handleUpdateYOffsets={handleUpdateYOffsets}
                 handleDeleteExercise={handleDeleteExercise}
+                setExercises={setExercises}
               />
             );
           }

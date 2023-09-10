@@ -34,6 +34,7 @@ const ExerciseDay = ({
   handleDeleteExercise,
   showAdvanced,
   handleHistoryButton,
+  setExercises,
 }) => {
   const [deletedExercises, setDeletedExercises] = useState([]);
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
@@ -91,7 +92,7 @@ const ExerciseDay = ({
         data={exercises.filter(e => !e.deleted)}
         renderItem={renderExerciseScreens}
         keyExtractor={(item, index) => `draggable-item-${index}`}
-        onDragEnd={({ data }) => setExercises(data)}
+        onDragEnd={({ data }) => setExercises(JSON.parse(JSON.stringify(data)))}
       />
       <Animated.View
         style={{
